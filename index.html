@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Thêm viewport để tối ưu hóa di động -->
+    <title>越南语听力练习</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding-bottom: 300px; /* Mặc định cho màn hình lớn */
+            background-color: #f7fbf3;
+        }
+        #gameContainer {
+            display: block;
+            min-height: calc(100vh - 150px); /* Đảm bảo nội dung chiếm đủ chiều cao màn hình */
+        }
+        #infoBox { 
+            width: 95%; 
+            max-width: 700px;
+            min-height: 100px; 
+            margin: 0 auto; 
+            border: 1px solid #ccc; 
+            background: #68838B; 
+            color: #D2B48C; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: clamp(40px, 5vw, 60px);
+            font-weight: bold;
+        }
+        #contactBox { 
+            width: 90%; 
+            max-width: 700px;
+            min-height: 25px; 
+            margin: 0px auto; 
+            border: 1px solid #ccc; 
+            background: #68838B; 
+            color: #D2B48C; 
+            display: flex; 
+            align-items: center; 
+            justify-content: left; 
+            padding-left: 20px;
+            font-size: clamp(16px, 2vw, 20px); 
+            font-weight: bold;
+        }
+        #instructionBox { 
+            width: 90%; 
+            max-width: 700px;
+            min-height: 25px; 
+            margin: 0px auto; 
+            border: 1px solid #ccc; 
+            background: #68838B; 
+            color: #D2B48C; 
+            display: flex; 
+            align-items: center; 
+            justify-content: left; 
+            padding-left: 20px;
+            font-size: clamp(16px, 2vw, 20px); 
+            font-weight: bold;
+        }
+        #controls { 
+            position: fixed; /* Cố định ở cuối màn hình */
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 800px; /* Giới hạn chiều rộng tối đa */
+            background: #68838B; 
+            padding: 10px 0; 
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); 
+            z-index: 1000; 
+        }
+        #controls div {
+            margin: 5px 0; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        button { 
+            padding: 8px 8px; 
+            margin: 0 5px; 
+            cursor: pointer; 
+            border: 3px solid #5d757d; 
+            background: #0f1314; 
+            color: #fffbef; 
+            font-size: 28px; 
+            border-radius: 5px; 
+        }
+        #sentenceNumber { 
+            width: 50px; 
+            padding: 10px; 
+            text-align: center; 
+            border: 3px solid #68838B; 
+            background: #FFAD5B; 
+            color: #000; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            -moz-appearance: textfield; 
+        }
+        #sentenceNumber::-webkit-inner-spin-button, 
+        #sentenceNumber::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        #sentenceNumber:disabled { 
+            background: #eee; 
+        }
+        .disabled { 
+            cursor: not-allowed; 
+            pointer-events: none; 
+        }
+        .active-mode { 
+            border: 4px solid orange; 
+        }
+        #indicator { 
+            width: 95%;
+                        max-width: 700px; 
+            min-height: 50px; 
+            margin: 10px auto; 
+                        padding: 5px;
+            border: 3px solid #734A2E; 
+            background: #ffffe0; 
+            border-radius: 10px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        #optionsContainer {
+            width: 100%;
+            max-width: 700px;
+            margin: 10px auto;
+        }
+        .optionBtn {
+            width: 95%; 
+            max-width: 700px;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #734A2E;
+            background: #ffffff; /*E6EDD9*/
+            color: #000;
+            font-size: 30px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .optionBtn:hover {
+            background: #D2E4C4;
+        }
+        .correct {
+            background: #B7D7AA !important;
+        }
+        .wrong {
+            background: #CE6D5E !important;
+        }
+        #score { 
+            display: none; 
+            width: 100%;
+            max-width: 700px;
+            margin: 10px auto; 
+            color: #FF6820; 
+            font-size: 30px; 
+            text-align: center;
+        }
+        #wrongSentences { 
+            display: none; 
+            width: 95%; 
+            max-width: 700px; 
+            margin: 10px auto; 
+            padding: 10px; 
+            border: 2px solid #CE6D5E; 
+            background: #FFF0F0; 
+            color: #CE6D5E; 
+            font-size: 30px; 
+            text-align: left; 
+            border-radius: 5px; 
+        }
+        #results { 
+            display: none; 
+            width: 95%;
+            max-width: 700px;        
+            margin: 10px auto; 
+            padding: 10px; 
+            border: 2px solid #734A2E; 
+            background: #fffbef; 
+            color: #000; 
+            font-size: 30px; 
+            text-align: left; 
+            border-radius: 5px; 
+            white-space: pre-line;
+        }
+
+        /* Media query cho thiết bị di động */
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 200px; /* Giảm padding-bottom cho điện thoại */
+            }
+            #controls {
+                padding: 5px 0; /* Giảm padding */
+            }
+            button {
+                padding: 6px 6px; /* Giảm kích thước nút */
+                font-size: 20px; /* Giảm kích thước chữ */
+            }
+            #sentenceNumber {
+                width: 40px; /* Giảm chiều rộng */
+                padding: 8px; /* Giảm padding */
+                font-size: 14px; /* Giảm kích thước chữ */
+            }
+            .optionBtn {
+                font-size: 20px; /* Giảm kích thước chữ cho đáp án */
+                padding: 8px; /* Giảm padding */
+            }
+            #infoBox {
+                font-size: clamp(30px, 4vw, 40px); /* Giảm kích thước chữ */
+            }
+            #contactBox, #instructionBox {
+                font-size: clamp(14px, 2vw, 16px); /* Giảm kích thước chữ */
+            }
+            #indicator {
+                min-height: 40px; /* Giảm chiều cao tối thiểu */
+            }
+            #results, #wrongSentences, #score {
+                font-size: 24px; /* Giảm kích thước chữ */
+                                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="infoBox">习得越南语<br>听力练习</div>
+        <div id="contactBox">讲师-阮玉煌 | Weixin：XiDeYueNanYu</div>
+        <div id="instructionBox">选择与播放内容相符的选项</div>
+        <div id="indicator"></div>
+        <div id="optionsContainer"></div>
+        <div id="results"></div>
+        <div id="score">0/0</div>
+        <div id="wrongSentences"></div>
+    </div>
+    <div id="controls">
+        <div>
+            <button id="freeModeBtn" class="active-mode">自由模式</button>
+            <button id="testModeBtn">作业模式</button>
+        </div>
+        <div>
+            <button id="autoContinueBtn">自动继续</button>
+            <button id="showHideBtn">显示-隐藏</button>
+        </div>
+        <div>
+            <button id="prevBtn">◀</button>
+            <input type="text" id="sentenceNumber" inputmode="numeric" pattern="[0-9]*">
+            <button id="nextBtn">▶</button>
+            <button id="replayBtn">再听一遍</button>
+        </div>
+    </div>
+    <audio id="mainAudio" src="audio.mp3"></audio>
+    <audio id="correctAudio" src="Dung.mp3"></audio>
+    <audio id="wrongAudio" src="Sai.mp3"></audio>
+
+    <script>
+        const audio = document.getElementById('mainAudio');
+        const correctAudio = document.getElementById('correctAudio');
+        const wrongAudio = document.getElementById('wrongAudio');
+        const indicator = document.getElementById('indicator');
+        const sentenceNumber = document.getElementById('sentenceNumber');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const replayBtn = document.getElementById('replayBtn');
+        const freeModeBtn = document.getElementById('freeModeBtn');
+        const testModeBtn = document.getElementById('testModeBtn');
+        const autoContinueBtn = document.getElementById('autoContinueBtn');
+        const showHideBtn = document.getElementById('showHideBtn');
+        const scoreDisplay = document.getElementById('score');
+        const wrongSentencesDisplay = document.getElementById('wrongSentences');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const resultsDisplay = document.getElementById('results');
+
+        const buttons = [prevBtn, nextBtn, replayBtn, freeModeBtn, testModeBtn, autoContinueBtn, showHideBtn];
+
+const sentences = [
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.194333,
+        "end": 2.024333,
+        "correctAnswer": "Anh ấy trông rất mệt mỏi.",
+        "translation": "他看起来非常疲惫。",
+        "options": [
+            "Anh ấy trông rắt mệt mỏi.",
+            "Anh ấy trông rất mệt mỏi.",
+            "Anh ấy trông rất mệt mõi.",
+            "Anh ấy trong rất mệt mỏi."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 3.024333,
+        "end": 4.754333,
+        "correctAnswer": "Cô ấy trông khá vui vẻ.",
+        "translation": "她看起来挺开心的。",
+        "options": [
+            "Cô ấy trông khá vui vẻ.",
+            "Cô ấy trông khã vui vẻ.",
+            "Cô ấy trông khá vui vẽ.",
+            "Cô ấy trông khá vuy vẻ."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 5.724333,
+        "end": 7.124333,
+        "correctAnswer": "Họ trông hơi lo lắng.",
+        "translation": "他们看起来有点担心。",
+        "options": [
+            "Họ trông hơi lo lắng.",
+            "Họ trông hơi lo lắn.",
+            "Họ trông hời lo lắng.",
+            "Họ trông hơi lô lắng."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 8.024333,
+        "end": 9.884333,
+        "correctAnswer": "Bà cụ trông có vẻ yếu.",
+        "translation": "老太太看起来好像很虚弱。",
+        "options": [
+            "Bà cụ trông có vẽ yếu.",
+            "Bà cụ trông có vẻ yếu.",
+            "Bà cụ trông có vẻ yểu.",
+            "Bà cụ trông có vẻ diếu."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 10.704333,
+        "end": 12.354333,
+        "correctAnswer": "Cậu trông có vẻ buồn ngủ.",
+        "translation": "你看起来有点困。",
+        "options": [
+            "Cậu trông có vẻ buồn ngủ.",
+            "Cậu trông có vẽ buồn ngủ.",
+            "Cậu trông có vẻ buồng ngủ.",
+            "Cậu trông có vẻ buồn ngũ."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 13.384333,
+        "end": 15.254333,
+        "correctAnswer": "Thầy giáo trông có vẻ nghiêm khắc.",
+        "translation": "老师看起来很严肃。",
+        "options": [
+            "Thầy giáo trông có vẻ nghiêm khắc.",
+            "Thầy giáo trông có vẻ nghiêm khắt.",
+            "Thầy giáo trông có vẽ nghiêm khắc.",
+            "Thầy giáo trông có vẻ nghiêm khác."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 16.614333,
+        "end": 17.954333,
+        "correctAnswer": "Tôi có nói gì đâu.",
+        "translation": "我哪有说什么。",
+        "options": [
+            "Tôi có nói gì đâu.",
+            "Tôi có nỗi gì đâu.",
+            "Tôi có nói gi đâu.",
+            "Tôi có nói gì đậu."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 18.934333,
+        "end": 20.594333,
+        "correctAnswer": "Anh ấy có làm gì đâu.",
+        "translation": "他又没做什么。",
+        "options": [
+            "Anh ấy có làm gì đâu.",
+            "Anh ấy có lam gì đâu.",
+            "Anh ấy có làm gi đâu.",
+            "Anh ẩy có làm gì đâu."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 21.364333,
+        "end": 22.774333,
+        "correctAnswer": "Họ có đi đâu đâu.",
+        "translation": "他们根本没去哪儿。",
+        "options": [
+            "Họ có đi đâu đâu.",
+            "Họ có đi đậu đâu.",
+            "Họ có đi đau đâu.",
+            "Họ có đi đâu đậu."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 23.624333,
+        "end": 25.314333,
+        "correctAnswer": "Con có làm sai gì đâu.",
+        "translation": "我又没做错什么。",
+        "options": [
+            "Con có làm sai gì đâu.",
+            "Con có làm xai gì đâu.",
+            "Con có làm sai gi đâu.",
+            "Con có làm sai gì đậu."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 26.094333,
+        "end": 27.904333,
+        "correctAnswer": "Hình như trời sắp mưa.",
+        "translation": "好像快下雨了。",
+        "options": [
+            "Hình như trời sắp mưa.",
+            "Hình như chời sắp mưa.",
+            "Hình như trời sắp múa.",
+            "Hình như trời sấp mưa."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 28.574333,
+        "end": 30.404333,
+        "correctAnswer": "Hình như cô ấy không vui.",
+        "translation": "她好像不开心。",
+        "options": [
+            "Hình như cô ấy không vui.",
+            "Hình như cô ấy không vuy.",
+            "Hình như cô ấy khong vui.",
+            "Hình như cô ẩy không vui."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 31.314333,
+        "end": 33.404333,
+        "correctAnswer": "Hình như tôi quên mang chìa khóa.",
+        "translation": "我好像忘带钥匙了。",
+        "options": [
+            "Hình như tôi quên mang chìa khóa.",
+            "Hình như tôi quên mang chia khóa.",
+            "Hình như tôi quên mang chìa khoá.",
+            "Hình như tôi quên mang chìa khã."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 34.214333,
+        "end": 36.494333,
+        "correctAnswer": "Hình như anh ấy đang tìm ai đó.",
+        "translation": "他好像在找人。",
+        "options": [
+            "Hình như anh ấy đang tìm ai đó.",
+            "Hình như anh ấy đang tìm ai đọ.",
+            "Hình như ảnh ấy đang tìm ai đó.",
+            "Hình như anh ấy đang tiềm ai đó."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 37.384333,
+        "end": 39.274333,
+        "correctAnswer": "Dường như cô ấy đang khóc.",
+        "translation": "她似乎正在哭。",
+        "options": [
+            "Dường như cô ấy đang khóc.",
+            "Dường như cô ấy đang khốc.",
+            "Dường như cô ẩy đang khóc.",
+            "Dường như cô ấy đang khót."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 40.134333,
+        "end": 42.404333,
+        "correctAnswer": "Dường như trời lạnh hơn hôm qua.",
+        "translation": "天气好像比昨天冷。",
+        "options": [
+            "Dường như trời lạnh hơn hôm qua.",
+            "Dường như trời lành hơn hôm qua.",
+            "Dường như chời lạnh hơn hôm qua.",
+            "Dường như trời lạnh hơn hôn qua."
+        ]
+    }
+];
+
+        let currentIndex = 0;
+        let isFreeMode = true;
+        let correctCount = 0;
+        let isPlaying = false;
+        let correctSentences = new Set();
+        let wrongSentences = new Set();
+        let autoContinue = false;
+        let showAnswer = false;
+        let userAnswers = [];
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function init() {
+            updateSentenceDisplay();
+        }
+
+        function updateSentenceDisplay() {
+            sentenceNumber.value = currentIndex + 1;
+            indicator.style.background = '#ffffe0';
+            if (isFreeMode && showAnswer) {
+                indicator.innerHTML = `
+                    <div style="font-size: 20px; font-weight: normal; color: #38761d;">${sentences[currentIndex].translation}</div>
+                `;
+            } else {
+                indicator.innerHTML = '';
+            }
+            updateOptions();
+            if (!isFreeMode) updateScore();
+        }
+
+        function updateOptions() {
+            optionsContainer.innerHTML = '';
+            const shuffledOptions = shuffleArray(sentences[currentIndex].options);
+            shuffledOptions.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'optionBtn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function playCurrentSentence() {
+            if (isPlaying) audio.pause();
+            buttons.forEach(btn => btn.classList.add('disabled'));
+            sentenceNumber.disabled = true;
+            isPlaying = true;
+            audio.src = sentences[currentIndex].audioFile;
+            audio.currentTime = sentences[currentIndex].start;
+            audio.play().catch(error => {
+                console.error('Audio playback failed:', error);
+                alert('Vui lòng nhấn nút “再听一遍” để phát âm thanh.');
+                buttons.forEach(btn => btn.classList.remove('disabled'));
+                sentenceNumber.disabled = false;
+                isPlaying = false;
+            });
+
+            audio.ontimeupdate = () => {
+                if (audio.currentTime >= sentences[currentIndex].end) {
+                    audio.pause();
+                    audio.ontimeupdate = null;
+                    buttons.forEach(btn => btn.classList.remove('disabled'));
+                    sentenceNumber.disabled = false;
+                    isPlaying = false;
+                }
+            };
+        }
+
+        function moveSentence(direction) {
+            currentIndex = (currentIndex + direction + sentences.length) % sentences.length;
+            updateSentenceDisplay();
+            playCurrentSentence();
+        }
+
+        function checkAnswer(selectedAnswer) {
+            const correctAnswer = sentences[currentIndex].correctAnswer;
+            const optionButtons = optionsContainer.getElementsByClassName('optionBtn');
+            
+            // Clear previous styles
+            for (let btn of optionButtons) {
+                btn.classList.remove('correct', 'wrong');
+                btn.disabled = !isFreeMode; // Only disable buttons in Test Mode
+            }
+
+            // Find and style the selected button
+            for (let btn of optionButtons) {
+                if (btn.textContent === selectedAnswer) {
+                    if (selectedAnswer === correctAnswer) {
+                        indicator.style.background = '#B7D7AA';
+                        btn.classList.add('correct');
+                        correctAudio.play().catch(error => {
+                            console.error('Correct audio playback failed:', error);
+                        });
+                    } else {
+                        indicator.style.background = '#CE6D5E';
+                        btn.classList.add('wrong');
+                        wrongAudio.play().catch(error => {
+                            console.error('Wrong audio playback failed:', error);
+                        });
+                    }
+                }
+            }
+
+            if (!isFreeMode) {
+                userAnswers[currentIndex] = selectedAnswer;
+                if (selectedAnswer === correctAnswer && !correctSentences.has(currentIndex)) {
+                    correctCount++;
+                    correctSentences.add(currentIndex);
+                    wrongSentences.delete(currentIndex);
+                } else if (selectedAnswer !== correctAnswer && !correctSentences.has(currentIndex)) {
+                    wrongSentences.add(currentIndex);
+                }
+                updateScore();
+
+                // Auto-move to next sentence in Test Mode
+                const audioToWait = (selectedAnswer === correctAnswer) ? correctAudio : wrongAudio;
+                audioToWait.onended = () => {
+                    if (userAnswers.length === sentences.length) {
+                        showResults();
+                    } else {
+                        setTimeout(() => {
+                            moveSentence(1);
+                        }, 200);
+                    }
+                };
+            } else if (isFreeMode && autoContinue && selectedAnswer === correctAnswer) {
+                // Auto-move in Free Mode only if answer is correct and autoContinue is enabled
+                correctAudio.onended = () => {
+                    setTimeout(() => {
+                        moveSentence(1);
+                    }, 200);
+                };
+            } else {
+                correctAudio.onended = null;
+                wrongAudio.onended = null;
+            }
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = `${correctCount}/${sentences.length}`;
+            scoreDisplay.style.display = 'block'; // Hiển thị score trong Test Mode
+        }
+
+        function showResults() {
+            let resultText = `练习完成！\n正确答案数量：${correctCount}/${sentences.length}\n正确率：${((correctCount / sentences.length) * 100).toFixed(2)}%\n错误题目：`;
+            wrongSentences.forEach(index => {
+                resultText += `\n第${index + 1}题：\n你的选择：${userAnswers[index] || '未选择'}\n正确答案：${sentences[index].correctAnswer}\n`;
+            });
+            if (wrongSentences.size === 0) {
+                resultText += '\n全部正确！';
+            }
+            resultsDisplay.textContent = resultText;
+            resultsDisplay.style.display = 'block';
+        }
+
+        prevBtn.onclick = () => {
+            moveSentence(-1);
+        };
+
+        nextBtn.onclick = () => {
+            moveSentence(1);
+        };
+
+        replayBtn.onclick = () => {
+            playCurrentSentence();
+        };
+
+        freeModeBtn.onclick = () => {
+            isFreeMode = true;
+            freeModeBtn.classList.add('active-mode');
+            testModeBtn.classList.remove('active-mode');
+            autoContinueBtn.disabled = false;
+            autoContinueBtn.classList.remove('disabled');
+            showHideBtn.disabled = false;
+            showHideBtn.classList.remove('disabled');
+            scoreDisplay.style.display = 'none';
+            wrongSentencesDisplay.style.display = 'none';
+            resultsDisplay.style.display = 'none';
+            updateSentenceDisplay();
+        };
+
+        testModeBtn.onclick = () => {
+            isFreeMode = false;
+            testModeBtn.classList.add('active-mode');
+            freeModeBtn.classList.remove('active-mode');
+            autoContinueBtn.disabled = true;
+            autoContinueBtn.classList.add('disabled');
+            showHideBtn.disabled = true;
+            showHideBtn.classList.add('disabled');
+            showHideBtn.classList.remove('active-mode');
+            showAnswer = false;
+            scoreDisplay.style.display = 'block';
+            currentIndex = 0;
+            correctCount = 0;
+            correctSentences.clear();
+            wrongSentences.clear();
+            userAnswers = [];
+            for (let i = 0; i < sentences.length; i++) {
+                wrongSentences.add(i);
+            }
+            updateSentenceDisplay();
+        };
+
+        autoContinueBtn.onclick = () => {
+            if (isFreeMode) {
+                autoContinue = !autoContinue;
+                autoContinueBtn.classList.toggle('active-mode');
+                if (!autoContinue) {
+                    correctAudio.onended = null;
+                }
+            }
+        };
+
+        showHideBtn.onclick = () => {
+            if (isFreeMode) {
+                showAnswer = !showAnswer;
+                showHideBtn.classList.toggle('active-mode');
+                updateSentenceDisplay();
+            }
+        };
+
+        sentenceNumber.onchange = () => {
+            if (!isPlaying) {
+                const num = parseInt(sentenceNumber.value) - 1;
+                if (!isNaN(num) && num >= 0 && num < sentences.length) {
+                    currentIndex = num;
+                    updateSentenceDisplay();
+                    playCurrentSentence();
+                } else {
+                    alert(`输入范围： 1 到 ${sentences.length}`);
+                    updateSentenceDisplay();
+                }
+            }
+        };
+
+        sentenceNumber.onkeydown = (e) => {
+            if (!isPlaying) {
+                if (e.key === 'ArrowLeft') {
+                    moveSentence(-1);
+                }
+                if (e.key === 'ArrowRight') {
+                    moveSentence(1);
+                }
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>
